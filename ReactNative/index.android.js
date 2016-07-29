@@ -28,7 +28,14 @@ var rowMap={"0":[0],"1":[1]}; //view类型，一共两种，第0种类型对应�
 class RecyclerList extends Component {
     constructor(props) {
         super(props);
-       
+        this._itemClicked = this._itemClicked.bind(this);  
+       DeviceEventEmitter.addListener(
+                       'item_clicked',
+                       this._itemClicked);
+    }
+    
+     _itemClicked(e:Event){
+        alert("click:"+e.position);
     }
 
     componentDidMount(){
