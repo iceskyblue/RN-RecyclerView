@@ -5,6 +5,6 @@
 ReactNative的源码，这里使用的时0.28版本的源码，最后目录结构如下图
 0000000000
 ##项目运行
-[可以直接下载apk](https://github.com/iceskyblue/RN-RecyclerView/blob/master/app-debug.apk)，在pc上配置好你的react环境，拷贝index.android.js 和文件夹RecyclerList到react环境，执行react-native start，然后打开apk<br>设置服务器地址。
+[可以直接下载app-debug.apk](https://github.com/iceskyblue/RN-RecyclerView/blob/master/app-debug.apk)，在pc上配置好你的react环境，拷贝index.android.js 和文件夹RecyclerList到react环境，执行react-native start，然后打开apk<br>设置服务器地址。
 ##运行截图
- [图片](https://github.com/iceskyblue/RN-RecyclerView/blob/master/Screenshot.png)
+ ![image](https://github.com/iceskyblue/RN-RecyclerView/blob/master/Screenshot.png)
