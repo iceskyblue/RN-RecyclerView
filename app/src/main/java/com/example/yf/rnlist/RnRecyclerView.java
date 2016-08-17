@@ -32,6 +32,7 @@ import com.facebook.react.uimanager.UIImplementation;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.views.image.ReactImageManager;
 import com.facebook.react.views.image.ReactImageView;
+import com.facebook.react.views.imagehelper.ImageSource;
 import com.facebook.react.views.text.ReactTextView;
 import com.facebook.react.views.view.ReactViewGroup;
 
@@ -42,11 +43,10 @@ import org.json.JSONObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -180,17 +180,29 @@ public class RnRecyclerView extends RecyclerView {
                     copyChild.setScaleType((ScalingUtils.ScaleType)scaleType.get(child));
                     Field imgSource = child.getClass().getDeclaredField("mSources");
                     imgSource.setAccessible(true);
-                    Map<String, Double> source = (Map)imgSource.get(child);
-                    Map<String, Double> copySource = new HashMap<>();
-                    Set<Map.Entry<String, Double>> items = source.entrySet();
-                    Iterator<Map.Entry<String, Double>> iter = items.iterator();
+                    List<ImageSource> source = (List<ImageSource>)imgSource.get(child);
+                    List<ImageSource> copySource = new LinkedList<>();
                     String imageName = null;
-                    while(iter.hasNext()){
-                        Map.Entry<String, Double> entry = iter.next();
+                    for(ImageSource item : source){
+                        ImageSource newSource = new ImageSource(null, null);
+                        Field uriF = ImageSource.class.getDeclaredField("mUri");
+                        Field sourceF = ImageSource.class.getDeclaredField("mSource");
+                        Field sizeF = ImageSource.class.getDeclaredField("mSize");
+                        Field resourceF = ImageSource.class.getDeclaredField("isResource");
+                        uriF.setAccessible(true);
+                        sourceF.setAccessible(true);
+                        sizeF.setAccessible(true);
+                        resourceF.setAccessible(true);
+
+                        uriF.set(newSource, item.getUri());
+                        sourceF.set(newSource, item.getSource());
+                        sizeF.setDouble(newSource, item.getSize());
+                        resourceF.setBoolean(newSource, item.isResource());
+
+                        copySource.add(newSource);
                         if(null == imageName){
-                            imageName = entry.getKey();
+                            imageName = item.getSource();
                         }
-                        copySource.put(entry.getKey(), entry.getValue());
                     }
                     Field newSource = copyChild.getClass().getDeclaredField("mSources");
                     newSource.setAccessible(true);
@@ -198,7 +210,7 @@ public class RnRecyclerView extends RecyclerView {
                     Field dirty = copyChild.getClass().getDeclaredField("mIsDirty");
                     dirty.setAccessible(true);
                     dirty.setBoolean(copyChild, true);
-                    if(null != imageName && copyDrawable(imageName) >= 0){
+                    if(null != imageName && copyDrawable(imageName) > 0){
                         copyChild.setScaleType(ImageView.ScaleType.FIT_XY);
                         copyChild.setImageResource(copyDrawable(imageName));
 
@@ -236,7 +248,6 @@ public class RnRecyclerView extends RecyclerView {
         if(null != data){
             this.setData(data.toString());
         }
-
     }
 
 
@@ -265,6 +276,11 @@ public class RnRecyclerView extends RecyclerView {
         }
 
         this.scrollToPosition(position);
+        int firstPos = ((LinearLayoutManager)getLayoutManager()).findFirstVisibleItemPosition();
+        View v = ((LinearLayoutManager)getLayoutManager()).findViewByPosition(firstPos);
+        if(null != v && v.getTop() == this.getPaddingTop() && firstPos == position){
+            return;
+        }
         ((LinearLayoutManager)getLayoutManager()).scrollToPositionWithOffset(position, 0);
         mAdapter.notifyDataSetChanged();
         mAdapter.notifyItemRangeChanged(position, 0 == mData.length() ? 0 : 1 );
@@ -491,7 +507,7 @@ public class RnRecyclerView extends RecyclerView {
     }
 
 
-    private static class RnViewHolder extends ViewHolder {
+    private static class RnViewHolder extends ViewHolder{
         public int viewType = -1;
         public boolean clickable;
         public OnItemTouchListener clickListener;
@@ -512,7 +528,7 @@ public class RnRecyclerView extends RecyclerView {
         }
     }
 
-    private static class OnItemTouchListener implements OnInterceptTouchEventListener {
+    private static class OnItemTouchListener implements OnInterceptTouchEventListener{
 
         public int position = -1;
         public long pressDownTime;
