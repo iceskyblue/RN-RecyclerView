@@ -1,5 +1,5 @@
 # RN-RecyclerView
-实现了可以UI复用的react native listview，解决RN本身listview的性能问题。
+实现了可以UI复用的react native listview，解决RN本身listview的性能问题, 可以下拉刷新，上拉加载更多。
 ##项目配置
 请在项目中的ReactNative文件夹里面放入RN模块，即平时初始化项目生成的node_modules，然后在node_modules\react-native\ReactAndroid目录放入<br>
 ReactNative的源码，这里使用的时0.31版本的源码，最后目录结构如下图
