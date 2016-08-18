@@ -12,6 +12,7 @@ import {
   Image,
   NativeModules,
   DeviceEventEmitter,
+  RefreshControl,
   PixelRatio
 } from 'react-native';
 
@@ -28,19 +29,52 @@ var rowMap={"0":[0],"1":[1]}; //view类型，一共两种，第0种类型对应�
 class RecyclerList extends Component {
     constructor(props) {
         super(props);
+         this.state = {isRefreshing:false};
         this._itemClicked = this._itemClicked.bind(this);  
        DeviceEventEmitter.addListener(
                        'item_clicked',
                        this._itemClicked);
+        this._onRefresh = this._onRefresh.bind(this);
+        this._endReached = this._endReached.bind(this);
+       
     }
     
      _itemClicked(e:Event){
         alert("click:"+e.position);
     }
+    
+    _endReached(){
+        alert("endReached add 10 rows data");
+        var extData = [];
+        
+        for(ii=0; ii<10; ii++){
+           if(ii%2 === 0){
+               //使用0类型的view
+               extData.push({'viewType':0, 'img':'http://facebook.github.io/react/img/logo_og.png', 'data':'ext data row'+ii});
+           }else{
+               //使用1类型的view， 其中data对应的TextView还支持html标签哦。
+               extData.push({'viewType':1, 'img':'http://facebook.github.io/react/img/logo_og.png', 'data':"<font size=16 color='#ff0000'>ext data row"+ii+"</font>"});
+           }
+           
+       }
+       
+       //给RecyclerView添加数据, 命令3表示添加数据
+       NativeModules.UIManager.dispatchViewManagerCommand( ReactNative.findNodeHandle(this.refs.recycle), 3, extData);
+    }
+    
+    _onRefresh(){
+        
+        this.setState({isRefreshing: true});
+      
+        setTimeout(function(){
+            isRefreshing = false;
+            this.setState({isRefreshing: false});
+        }.bind(this), 3000);
+    }
 
     componentDidMount(){
         //构造数据
-       for(ii=0; ii<1000; ii++){
+       for(ii=0; ii<100; ii++){
            if(ii%2 === 0){
                //使用0类型的view
                dataSet.push({'viewType':0, 'img':'http://facebook.github.io/react/img/logo_og.png', 'data':'row'+ii});
@@ -86,13 +120,18 @@ class RecyclerList extends Component {
    }
 
     render(){
-        return (<RnRecycleView ref='recycle'
+        return (<RefreshControl style={{flex:1}}
+                    refreshing={this.state.isRefreshing}
+                    onRefresh={this._onRefresh}>
+                <RnRecycleView ref='recycle'
                 style={{flex:1, paddingTop:2}}
                 childViewCount={2} // 一共创建两行view
                 renderTypeView={this._renderRow} //创建view的函数
                 viewTypesMap={rowMap} //view类型映射关系
+                endReached={this._endReached}
         >
-        </RnRecycleView>);
+        </RnRecycleView>
+        </RefreshControl>);
     }
 }
 

@@ -78,6 +78,9 @@ public class RnRecyclerViewManager extends
         }else if(commandId  == 2){
             //data change event
             root.setData(args);
+        }else if(commandId == 3){
+            //add data
+            root.addData(args);
         }
     }
 }

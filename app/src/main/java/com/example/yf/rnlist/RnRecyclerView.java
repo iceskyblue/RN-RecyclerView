@@ -2,6 +2,7 @@ package com.example.yf.rnlist;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -98,7 +99,20 @@ public class RnRecyclerView extends RecyclerView {
         this.getRecycledViewPool().setMaxRecycledViews(0, 0);
 
         setAdapter(this.mAdapter);
+        this.addOnScrollListener(new OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
 
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if(!ViewCompat.canScrollVertically(recyclerView, 1)){
+                    mEventHelper.sendReachEndEvent();
+                }
+            }
+        });
     }
 
     public synchronized void addViewType(View v, int index){
@@ -247,6 +261,12 @@ public class RnRecyclerView extends RecyclerView {
     public void setData(ReadableArray data){
         if(null != data){
             this.setData(data.toString());
+        }
+    }
+
+    public void addData(ReadableArray data){
+        if(null != data){
+            this.addData(data.toString());
         }
     }
 
