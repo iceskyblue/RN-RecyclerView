@@ -9,3 +9,5 @@ ReactNative的源码，这里使用的时0.31版本的源码，最后目录结�
 示例程序见：ReactNative/index.android.js
 ##运行截图
  ![image](https://github.com/iceskyblue/RN-RecyclerView/blob/master/Screenshot.png)
+ ##实现思路
+ https://github.com/password_reset/00ca74e0d1de3314faf2c43be1a12bf18efb341c5b98136492ce587078ca83a5656d61696cb2696365736b79626c7565403132362e636f6da5666f726365c2b374776f5f666163746f725f7665726966696564c2
